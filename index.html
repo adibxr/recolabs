@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -23,6 +24,7 @@
         },
       };
     </script>
+    <!-- Add Tailwind Animate Plugin for smooth UI transitions -->
     <style>
       @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
       
@@ -45,6 +47,41 @@
       }
       ::-webkit-scrollbar-thumb:hover {
         background: #475569;
+      }
+      
+      /* Animation Utilities (Polyfill for tailwindcss-animate in browser CDN) */
+      @keyframes enter {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .animate-in {
+        animation-fill-mode: forwards;
+        animation-duration: 0.5s;
+        animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .fade-in {
+        animation-name: fadeIn;
+      }
+      .zoom-in-95 {
+        animation-name: enter;
+      }
+      .slide-in-from-bottom-2 {
+        animation-name: slideIn;
+      }
+      .slide-in-from-bottom-4 {
+        animation-name: slideIn;
+      }
+      .slide-in-from-bottom-8 {
+        animation-name: slideIn;
       }
     </style>
   <script type="importmap">

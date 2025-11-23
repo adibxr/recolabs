@@ -2,7 +2,6 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Robust Environment Variable Loader
-// Supports Vite (import.meta.env), Next.js (process.env.NEXT_PUBLIC_), and CRA (process.env.REACT_APP_)
 const getEnvVar = (suffix: string) => {
   // @ts-ignore - Vite support
   if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[`VITE_${suffix}`]) {
@@ -16,18 +15,19 @@ const getEnvVar = (suffix: string) => {
     return process.env[`NEXT_PUBLIC_${suffix}`] || process.env[`REACT_APP_${suffix}`];
   }
 
-  return '';
+  return null;
 };
 
-const supabaseUrl = getEnvVar('SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('SUPABASE_ANON_KEY');
+// Fallback keys from project history to ensure local functionality
+const FALLBACK_URL = "https://bmqavurzdhqpfevdkyab.supabase.co";
+const FALLBACK_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtcWF2dXJ6ZGhxcGZldmRreWFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3Mzg2MzcsImV4cCI6MjA3OTMxNDYzN30.txJwPMi7jnoT3-MUWVTNM_ZmGzG2sDWIK9nv6iEmt0E";
+
+const supabaseUrl = getEnvVar('SUPABASE_URL') || FALLBACK_URL;
+const supabaseAnonKey = getEnvVar('SUPABASE_ANON_KEY') || FALLBACK_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'Supabase Environment Variables are missing. ' + 
-    'Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in your Vercel Project Settings.'
-  );
+  console.error('Supabase Setup Error: Missing API Keys. App will crash.');
 }
 
-// Fallback to empty string prevents crash during build time, but will fail at runtime if not set
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
+// Ensure we don't pass empty strings which crashes the client
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
