@@ -23,7 +23,7 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
   const [code, setCode] = useState('');
-  const [formStatus, setFormStatus] = useState<{type: 'error'|'success'|'', msg: ''}>({type: '', msg: ''});
+  const [formStatus, setFormStatus] = useState<{type: 'error'|'success'|'', msg: string}>({type: '', msg: ''});
 
   useEffect(() => {
     fetchData();
