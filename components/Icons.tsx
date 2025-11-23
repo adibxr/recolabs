@@ -1,0 +1,39 @@
+
+import React from 'react';
+import { 
+  BookOpen, 
+  QrCode, 
+  Scan, 
+  User, 
+  LogOut, 
+  Plus, 
+  Trash2, 
+  X,
+  CheckCircle,
+  AlertCircle,
+  Folder,
+  ArrowRight,
+  Database,
+  Download,
+  Clock,
+  FileText
+} from 'lucide-react';
+
+export const Icons = {
+  BookOpen,
+  QrCode,
+  Scan,
+  User,
+  LogOut,
+  Plus,
+  Trash2,
+  X,
+  CheckCircle,
+  AlertCircle,
+  Folder,
+  ArrowRight,
+  Database,
+  Download,
+  Clock,
+  FileText
+};
