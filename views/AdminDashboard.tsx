@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { deleteBook, addBook, getBooks, getAllTransactions, approveReturn } from '../services/dbService';
 import { Book, Transaction, DashboardView } from '../types';
 import { Icons } from '../components/Icons';
@@ -13,6 +13,7 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
   // Modal & Actions
   const [selectedBookForQr, setSelectedBookForQr] = useState<Book | null>(null);
@@ -30,7 +31,8 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
 
   const fetchData = async () => {
     try {
-      setLoading(true);
+      // Don't set loading true on refresh to keep UI smooth, only on initial mount if needed
+      if (books.length === 0) setLoading(true);
       const [booksData, txData] = await Promise.all([getBooks(), getAllTransactions()]);
       setBooks(booksData);
       setTransactions(txData);
@@ -41,28 +43,46 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
     }
   };
 
-  // --- Logic Helpers ---
+  // --- Logic Helpers (Memoized for Performance) ---
   
   // Pending Returns: Tx Status is ACTIVE but ReturnDate is NOT NULL
-  const pendingReturns = transactions.filter(t => t.status === 'ACTIVE' && t.return_date !== null);
+  const pendingReturns = useMemo(() => 
+    transactions.filter(t => t.status === 'ACTIVE' && t.return_date !== null),
+  [transactions]);
   
   // Overdue: Tx Status is ACTIVE, ReturnDate is NULL, IssueDate > 10 days
-  const overdueTransactions = transactions.filter(t => {
+  const overdueTransactions = useMemo(() => transactions.filter(t => {
       if (t.status !== 'ACTIVE' || t.return_date !== null) return false;
       const issueDate = new Date(t.issue_date);
       const diffTime = Math.abs(new Date().getTime() - issueDate.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
       return diffDays > 10;
-  });
+  }), [transactions]);
 
-  const activeIssues = transactions.filter(t => t.status === 'ACTIVE' && t.return_date === null);
+  const activeIssues = useMemo(() => 
+    transactions.filter(t => t.status === 'ACTIVE' && t.return_date === null),
+  [transactions]);
 
-  const groupedBooks = books.reduce<Record<string, Book[]>>((acc, book) => {
-    const cat = book.category || 'UNCATEGORIZED';
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(book);
-    return acc;
-  }, {});
+  // Filter books based on search
+  const filteredBooks = useMemo(() => {
+    if (!searchTerm) return books;
+    const lower = searchTerm.toLowerCase();
+    return books.filter(b => 
+        b.title.toLowerCase().includes(lower) || 
+        b.category.toLowerCase().includes(lower) ||
+        b.unique_code.includes(lower)
+    );
+  }, [books, searchTerm]);
+
+  // Group books (using filtered list)
+  const groupedBooks = useMemo(() => {
+    return filteredBooks.reduce<Record<string, Book[]>>((acc, book) => {
+        const cat = book.category || 'UNCATEGORIZED';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(book);
+        return acc;
+    }, {});
+  }, [filteredBooks]);
 
 
   // --- Actions ---
@@ -81,7 +101,7 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
       setFormStatus({type: 'success', msg: `Added "${title}"`});
       setTitle('');
       setCode('');
-      fetchData();
+      fetchData(); // Background refresh
       setTimeout(() => {
         setIsAddModalOpen(false);
         setFormStatus({type: '', msg: ''});
@@ -138,7 +158,7 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
                 className="p-2.5 rounded-full bg-zinc-900/50 border border-white/5 hover:border-white/20 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"
                 title="Refresh Data"
             >
-                <Icons.Database className="w-4 h-4" />
+                <Icons.Database className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
              <button 
                  onClick={onExit}
@@ -148,15 +168,13 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
              </button>
              <div className="h-6 w-px bg-white/10 mx-1"></div>
              <button onClick={onLogout} className="px-4 py-2 text-xs font-bold text-zinc-500 hover:text-red-400 transition-colors uppercase tracking-wider">Sign Out</button>
-             
-             {/* ADD BOOK BUTTON REMOVED FROM HERE as requested */}
          </div>
       </header>
 
       <main className="p-8 max-w-[1600px] mx-auto space-y-10">
           
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-in slide-in-from-bottom-2 duration-500">
               {[
                   { label: 'BOOKS ISSUED', val: activeIssues.length, color: 'text-white', sub: 'Currently out' },
                   { label: 'PENDING RETURNS', val: pendingReturns.length, color: 'text-amber-400', sub: 'Require approval' },
@@ -184,13 +202,13 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
                   { id: 'directory', label: 'Directory' },
                   { id: 'reviews', label: 'Review Queue', count: pendingReturns.length },
                   { id: 'overdue', label: 'Overdue Logs', count: overdueTransactions.length },
-                  // Removed 'Settings' tab as requested
               ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => {
                         setView(tab.id as any);
-                        setActiveCategory(null); // Reset category view on tab switch
+                        setActiveCategory(null);
+                        setSearchTerm('');
                     }}
                     className={`relative pb-4 text-sm font-medium transition-colors flex items-center gap-2 tracking-wide ${view === tab.id ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
                   >
@@ -220,22 +238,26 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
                             <Icons.Scan className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
                             <input 
                                 type="text" 
-                                placeholder="SEARCH ASSETS..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="SEARCH ASSETS (Title, ID, Folder)..." 
                                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl py-4 pl-10 pr-4 text-sm text-white placeholder:text-zinc-800 focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/20 focus:outline-none transition-all font-mono uppercase"
                             />
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {/* Create New "Folder" Visual */}
-                            <button 
-                                onClick={() => setIsAddModalOpen(true)}
-                                className="group h-48 rounded-2xl border border-dashed border-zinc-800 hover:border-indigo-500/50 bg-transparent hover:bg-indigo-500/5 transition-all flex flex-col items-center justify-center gap-4"
-                            >
-                                <div className="p-4 rounded-full bg-zinc-900 border border-zinc-800 group-hover:border-indigo-500/30 group-hover:bg-indigo-500/20 transition-all shadow-lg">
-                                    <Icons.Plus className="w-6 h-6 text-zinc-600 group-hover:text-indigo-400" />
-                                </div>
-                                <span className="text-sm font-bold text-zinc-500 group-hover:text-indigo-300 uppercase tracking-wide">Add Resource</span>
-                            </button>
+                            {/* Create New "Folder" Visual (only show when not searching) */}
+                            {!searchTerm && (
+                                <button 
+                                    onClick={() => setIsAddModalOpen(true)}
+                                    className="group h-48 rounded-2xl border border-dashed border-zinc-800 hover:border-indigo-500/50 bg-transparent hover:bg-indigo-500/5 transition-all flex flex-col items-center justify-center gap-4"
+                                >
+                                    <div className="p-4 rounded-full bg-zinc-900 border border-zinc-800 group-hover:border-indigo-500/30 group-hover:bg-indigo-500/20 transition-all shadow-lg">
+                                        <Icons.Plus className="w-6 h-6 text-zinc-600 group-hover:text-indigo-400" />
+                                    </div>
+                                    <span className="text-sm font-bold text-zinc-500 group-hover:text-indigo-300 uppercase tracking-wide">Add Resource</span>
+                                </button>
+                            )}
 
                             {Object.entries(groupedBooks).map(([catName, catBooks]) => (
                                 <div 
@@ -247,16 +269,9 @@ const AdminDashboard: React.FC<{ onLogout: () => void; onExit: () => void }> = (
                                         <div className="p-3 rounded-xl bg-zinc-900/80 text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-all border border-white/5 group-hover:border-indigo-400/50 shadow-inner">
                                             <Icons.Folder className="w-6 h-6" />
                                         </div>
-                                        <span className="text-zinc-700 group-hover:text-red-400 transition-colors cursor-pointer p-2 hover:bg-red-500/10 rounded-lg"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                alert('To delete a folder, delete all books inside it.');
-                                            }}
-                                        >
-                                            <Icons.Trash2 className="w-4 h-4" />
-                                        </span>
+                                        {/* Simplified folder delete for safety */}
                                     </div>
-                                    <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide font-mono">{catName}</h3>
+                                    <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide font-mono truncate">{catName}</h3>
                                     <div className="flex items-center gap-2 text-zinc-500 text-xs font-mono">
                                         <Icons.Database className="w-3 h-3" />
                                         <span>{(catBooks as Book[]).length} RESOURCES</span>
