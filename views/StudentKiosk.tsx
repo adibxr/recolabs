@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { getBookByCode, getStudentById, createStudent, issueBook, returnBook } from '../services/dbService';
 import { Book } from '../types';
@@ -53,10 +54,6 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
       }
 
       setScannedBook(book);
-
-      // Logic based on whether we started in Issue or Return flow
-      // However, the user might just type a code. We need to know intent.
-      // Using state `mode` to determine intent.
       
       if (mode === 'issue_flow') {
           if (book.status === 'ISSUED') {
@@ -154,8 +151,6 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
   };
 
   const reset = () => {
-    // If currently in result, go back to home or stay in flow? 
-    // Requirement implies "smooth". Let's go to Home to be safe/clean.
     setMode('home');
     setScannedBook(null);
     setStudentDetails({ id: '', name: '', email: '', phone: '' });
@@ -166,17 +161,17 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
   // --- Render Components ---
 
   return (
-    <div className="min-h-screen bg-black text-zinc-100 font-sans flex flex-col relative overflow-hidden selection:bg-white/20">
+    <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 font-sans flex flex-col relative overflow-hidden selection:bg-indigo-500/20 transition-colors duration-300">
       
       {/* Top Navigation */}
       <nav className="w-full px-8 py-8 flex items-center justify-between z-50">
         <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-            <span className="text-xs font-bold tracking-[0.25em] font-mono">RECO_LABS</span>
+            <div className="w-3 h-3 bg-zinc-900 dark:bg-white rounded-full animate-pulse"></div>
+            <span className="text-xs font-bold tracking-[0.25em] font-mono text-zinc-900 dark:text-white">RECO_LABS</span>
         </div>
         <button 
           onClick={onAdminClick}
-          className="text-[10px] font-bold tracking-widest text-zinc-600 hover:text-white transition-colors uppercase border border-transparent hover:border-white/10 px-4 py-2 rounded-full"
+          className="text-[10px] font-bold tracking-widest text-zinc-500 hover:text-zinc-900 dark:text-zinc-600 dark:hover:text-white transition-colors uppercase border border-transparent hover:border-zinc-200 dark:hover:border-white/10 px-4 py-2 rounded-full"
         >
           Admin Panel
         </button>
@@ -184,8 +179,8 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
 
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px] transition-all duration-1000 ${mode === 'issue_flow' ? 'bg-indigo-900/20' : mode === 'return_flow' ? 'bg-emerald-900/10' : 'bg-zinc-900/10'}`}></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+          <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-[150px] transition-all duration-1000 ${mode === 'issue_flow' ? 'bg-indigo-200/50 dark:bg-indigo-900/20' : mode === 'return_flow' ? 'bg-emerald-200/50 dark:bg-emerald-900/10' : 'bg-zinc-200/50 dark:bg-zinc-900/10'}`}></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
       </div>
 
       {/* Main Content Area */}
@@ -197,29 +192,29 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                  {/* ISSUE CARD */}
                  <button 
                     onClick={() => handleFlowSelection('issue')}
-                    className="group relative h-96 rounded-3xl border border-white/5 bg-zinc-900/30 backdrop-blur-sm hover:bg-indigo-950/20 hover:border-indigo-500/30 transition-all overflow-hidden flex flex-col items-center justify-center text-center p-8"
+                    className="group relative h-96 rounded-3xl border border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/30 backdrop-blur-sm hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-500/30 transition-all overflow-hidden flex flex-col items-center justify-center text-center p-8 shadow-xl dark:shadow-none"
                  >
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="w-20 h-20 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-indigo-500/50 transition-all shadow-2xl">
-                        <Icons.BookOpen className="w-8 h-8 text-zinc-400 group-hover:text-indigo-400" />
+                    <div className="w-20 h-20 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-indigo-500/50 transition-all shadow-xl dark:shadow-2xl">
+                        <Icons.BookOpen className="w-8 h-8 text-zinc-400 dark:text-zinc-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">ISSUE RESOURCE</h2>
+                    <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2 tracking-tight">ISSUE RESOURCE</h2>
                     <p className="text-zinc-500 text-sm font-mono max-w-xs">Check out books, comics, or materials from the library.</p>
-                    <span className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-500 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">Initiate Sequence &rarr;</span>
+                    <span className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-500 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">Initiate Sequence &rarr;</span>
                  </button>
 
                  {/* RETURN CARD */}
                  <button 
                     onClick={() => handleFlowSelection('return')}
-                    className="group relative h-96 rounded-3xl border border-white/5 bg-zinc-900/30 backdrop-blur-sm hover:bg-emerald-950/20 hover:border-emerald-500/30 transition-all overflow-hidden flex flex-col items-center justify-center text-center p-8"
+                    className="group relative h-96 rounded-3xl border border-zinc-200 dark:border-white/5 bg-white/50 dark:bg-zinc-900/30 backdrop-blur-sm hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:border-emerald-500/30 transition-all overflow-hidden flex flex-col items-center justify-center text-center p-8 shadow-xl dark:shadow-none"
                  >
                     <div className="absolute inset-0 bg-gradient-to-b from-transparent to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="w-20 h-20 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-emerald-500/50 transition-all shadow-2xl">
-                        <Icons.CheckCircle className="w-8 h-8 text-zinc-400 group-hover:text-emerald-400" />
+                    <div className="w-20 h-20 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:border-emerald-500/50 transition-all shadow-xl dark:shadow-2xl">
+                        <Icons.CheckCircle className="w-8 h-8 text-zinc-400 dark:text-zinc-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400" />
                     </div>
-                    <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">RETURN RESOURCE</h2>
+                    <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2 tracking-tight">RETURN RESOURCE</h2>
                     <p className="text-zinc-500 text-sm font-mono max-w-xs">Return borrowed items to the ecosystem.</p>
-                    <span className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-500 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">Initiate Sequence &rarr;</span>
+                    <span className="mt-8 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-500 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">Initiate Sequence &rarr;</span>
                  </button>
              </div>
         )}
@@ -227,12 +222,12 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
         {/* FLOW MODE: Scan or Type */}
         {(mode === 'issue_flow' || mode === 'return_flow') && (
              <div className="flex flex-col items-center w-full max-w-md animate-in slide-in-from-bottom-8 fade-in duration-500">
-                 <button onClick={handleBackToHome} className="self-start mb-8 text-xs font-bold text-zinc-500 hover:text-white flex items-center gap-2 uppercase tracking-wider transition-colors">
+                 <button onClick={handleBackToHome} className="self-start mb-8 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-2 uppercase tracking-wider transition-colors">
                      <Icons.ArrowRight className="w-4 h-4 rotate-180" /> Back
                  </button>
                  
                  <div className="text-center mb-10">
-                     <h2 className="text-4xl font-bold text-white mb-2 tracking-tight">
+                     <h2 className="text-4xl font-bold text-zinc-900 dark:text-white mb-2 tracking-tight">
                          {mode === 'issue_flow' ? 'ISSUE ITEM' : 'RETURN ITEM'}
                      </h2>
                      <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">
@@ -243,7 +238,7 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                  {/* Scan Button */}
                  <button 
                     onClick={() => setShowScanner(true)}
-                    className={`w-full py-6 rounded-2xl border flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] mb-8 shadow-2xl ${
+                    className={`w-full py-6 rounded-2xl border flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] mb-8 shadow-xl hover:shadow-2xl ${
                         mode === 'issue_flow' 
                         ? 'bg-indigo-600 border-indigo-500 hover:bg-indigo-500 text-white' 
                         : 'bg-emerald-600 border-emerald-500 hover:bg-emerald-500 text-white'
@@ -254,9 +249,9 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                  </button>
 
                  <div className="flex items-center w-full gap-4 mb-8">
-                     <div className="h-px bg-zinc-800 flex-1"></div>
-                     <span className="text-[10px] text-zinc-600 font-mono uppercase">Or Enter Manually</span>
-                     <div className="h-px bg-zinc-800 flex-1"></div>
+                     <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
+                     <span className="text-[10px] text-zinc-500 dark:text-zinc-600 font-mono uppercase">Or Enter Manually</span>
+                     <div className="h-px bg-zinc-200 dark:bg-zinc-800 flex-1"></div>
                  </div>
 
                  {/* Manual Input */}
@@ -268,11 +263,11 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                         onChange={(e) => setManualCode(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && processBookCode(manualCode)}
                         placeholder="0000"
-                        className="w-full bg-zinc-900/50 border border-zinc-800 focus:border-white/30 rounded-2xl py-5 text-center text-2xl font-mono tracking-[0.5em] text-white outline-none transition-all placeholder:text-zinc-800"
+                        className="w-full bg-white dark:bg-zinc-900/50 border border-zinc-300 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-white/30 rounded-2xl py-5 text-center text-2xl font-mono tracking-[0.5em] text-zinc-900 dark:text-white outline-none transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-800 shadow-sm dark:shadow-none"
                     />
                     <button 
                         onClick={() => processBookCode(manualCode)}
-                        className="absolute right-2 top-2 bottom-2 px-4 bg-white/5 hover:bg-white/10 rounded-xl text-zinc-400 hover:text-white transition-colors"
+                        className="absolute right-2 top-2 bottom-2 px-4 bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 rounded-xl text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                     >
                         <Icons.ArrowRight className="w-5 h-5" />
                     </button>
@@ -282,13 +277,13 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
 
         {/* AUTH (ISSUE ONLY) */}
         {mode === 'auth' && scannedBook && (
-             <div className="w-full max-w-md bg-zinc-900 border border-white/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300">
+             <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 p-8 rounded-3xl shadow-2xl animate-in zoom-in-95 duration-300">
                 <div className="flex justify-between items-start mb-6">
                     <div>
-                        <h3 className="text-xl font-bold text-white">{scannedBook.title}</h3>
+                        <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{scannedBook.title}</h3>
                         <p className="text-xs text-zinc-500 font-mono mt-1 uppercase">{scannedBook.category} // {scannedBook.unique_code}</p>
                     </div>
-                    <div className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold rounded border border-emerald-500/20">
+                    <div className="px-3 py-1 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold rounded border border-emerald-200 dark:border-emerald-500/20">
                         AVAILABLE
                     </div>
                 </div>
@@ -301,7 +296,7 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                             value={studentDetails.id}
                             onChange={(e) => setStudentDetails({...studentDetails, id: e.target.value})}
                             onBlur={handleIdBlur}
-                            className="w-full bg-black border border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-white outline-none font-mono transition-colors"
+                            className="w-full bg-zinc-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-zinc-900 dark:text-white outline-none font-mono transition-colors"
                             placeholder="ENTER ID"
                             autoFocus
                         />
@@ -315,7 +310,7 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                             onChange={(e) => setStudentDetails({...studentDetails, name: e.target.value})}
                             readOnly={isExistingStudent}
                             placeholder="FULL NAME"
-                            className={`w-full bg-black border border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
+                            className={`w-full bg-zinc-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-zinc-900 dark:text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
                             required
                         />
                         <input 
@@ -324,7 +319,7 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                             onChange={(e) => setStudentDetails({...studentDetails, email: e.target.value})}
                             readOnly={isExistingStudent}
                             placeholder="EMAIL ADDRESS"
-                            className={`w-full bg-black border border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
+                            className={`w-full bg-zinc-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-zinc-900 dark:text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
                             required
                         />
                          <input 
@@ -333,16 +328,16 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
                             onChange={(e) => setStudentDetails({...studentDetails, phone: e.target.value})}
                             readOnly={isExistingStudent}
                             placeholder="PHONE NUMBER"
-                            className={`w-full bg-black border border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
+                            className={`w-full bg-zinc-50 dark:bg-black border border-zinc-300 dark:border-zinc-800 focus:border-indigo-500 rounded-xl p-4 text-sm text-zinc-900 dark:text-white outline-none font-mono transition-colors ${isExistingStudent && 'text-zinc-500 cursor-not-allowed'}`}
                             required
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 mt-6">
-                        <button type="button" onClick={reset} className="py-4 rounded-xl border border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white text-xs font-bold tracking-widest transition-colors">
+                        <button type="button" onClick={reset} className="py-4 rounded-xl border border-zinc-300 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-white text-xs font-bold tracking-widest transition-colors">
                             CANCEL
                         </button>
-                        <button type="submit" disabled={loading} className="py-4 rounded-xl bg-white text-black hover:bg-zinc-200 text-xs font-bold tracking-widest transition-colors shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                        <button type="submit" disabled={loading} className="py-4 rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-black hover:bg-zinc-800 dark:hover:bg-zinc-200 text-xs font-bold tracking-widest transition-colors shadow-lg dark:shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                             {loading ? 'SYNCING...' : 'CONFIRM ISSUE'}
                         </button>
                     </div>
@@ -353,14 +348,14 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
         {/* RESULT SCREEN */}
         {mode === 'result' && (
              <div className="text-center animate-in zoom-in-95 duration-300 max-w-md">
-                <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-8 border-2 ${message.type === 'success' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500' : 'border-red-500/20 bg-red-500/10 text-red-500'}`}>
+                <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-8 border-2 ${message.type === 'success' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' : 'border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-500'}`}>
                     {message.type === 'success' ? <Icons.CheckCircle className="w-10 h-10" /> : <Icons.AlertCircle className="w-10 h-10" />}
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-4 tracking-tight">{message.title}</h3>
-                <p className="text-zinc-400 text-sm font-mono leading-relaxed mb-10 border-l-2 border-zinc-800 pl-4 ml-4 text-left">
+                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight">{message.title}</h3>
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm font-mono leading-relaxed mb-10 border-l-2 border-zinc-300 dark:border-zinc-800 pl-4 ml-4 text-left">
                     {message.text}
                 </p>
-                <button onClick={reset} className="px-10 py-4 rounded-xl bg-zinc-900 border border-white/10 hover:bg-white hover:text-black text-white text-xs font-bold tracking-widest uppercase transition-all">
+                <button onClick={reset} className="px-10 py-4 rounded-xl bg-zinc-900 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 hover:bg-zinc-800 dark:hover:bg-white hover:text-white dark:hover:text-black text-white text-xs font-bold tracking-widest uppercase transition-all shadow-lg">
                     Return to System
                 </button>
              </div>
@@ -369,7 +364,7 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
         {/* LOADING */}
         {mode === 'processing' && (
             <div className="flex flex-col items-center justify-center">
-                <div className="w-16 h-16 border-4 border-zinc-800 border-t-white rounded-full animate-spin mb-6"></div>
+                <div className="w-16 h-16 border-4 border-zinc-300 dark:border-zinc-800 border-t-zinc-900 dark:border-t-white rounded-full animate-spin mb-6"></div>
                 <p className="text-xs font-mono tracking-[0.3em] text-zinc-500 animate-pulse">ACCESSING DATABASE...</p>
             </div>
         )}
@@ -379,8 +374,8 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick }) => {
       {/* Footer */}
       <footer className="w-full py-6 text-center z-40">
         <div className="flex items-center justify-center gap-2 opacity-30">
-             <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-             <p className="text-[10px] font-bold font-mono tracking-[0.3em]">RECO ECOSYSTEM v2.0</p>
+             <div className="w-1.5 h-1.5 bg-zinc-900 dark:bg-white rounded-full"></div>
+             <p className="text-[10px] font-bold font-mono tracking-[0.3em] text-zinc-900 dark:text-white">RECO ECOSYSTEM v2.0</p>
         </div>
       </footer>
 
