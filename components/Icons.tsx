@@ -16,7 +16,14 @@ import {
   Database,
   Download,
   Clock,
-  FileText
+  FileText,
+  Menu,
+  Globe,
+  Github,
+  Linkedin,
+  Mail,
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react';
 
 export const Icons = {
@@ -35,5 +42,12 @@ export const Icons = {
   Database,
   Download,
   Clock,
-  FileText
+  FileText,
+  Menu,
+  Globe,
+  Github,
+  Linkedin,
+  Mail,
+  ExternalLink,
+  ChevronRight
 };

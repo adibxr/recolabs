@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import AdminDashboard from './views/AdminDashboard';
 import StudentKiosk from './views/StudentKiosk';
+import DocsPage from './views/DocsPage';
 import { supabase } from './services/supabaseClient';
 import { Icons } from './components/Icons';
 
 function App() {
-  const [view, setView] = useState<'kiosk' | 'admin'>('kiosk');
+  const [view, setView] = useState<'kiosk' | 'admin' | 'docs'>('kiosk');
   const [session, setSession] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(false);
   
@@ -55,6 +56,12 @@ function App() {
     setView('kiosk');
   }
 
+  // Docs View
+  if (view === 'docs') {
+    return <DocsPage onBack={() => setView('kiosk')} />;
+  }
+
+  // Admin View
   if (view === 'admin') {
     if (!session) {
       // Admin Login Form
@@ -110,7 +117,8 @@ function App() {
     return <AdminDashboard onLogout={handleLogout} onExit={handleBackToKiosk} />;
   }
 
-  return <StudentKiosk onAdminClick={() => setView('admin')} />;
+  // Kiosk View (Default)
+  return <StudentKiosk onAdminClick={() => setView('admin')} onDocsClick={() => setView('docs')} />;
 }
 
 export default App;
