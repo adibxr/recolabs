@@ -34,13 +34,14 @@ function App() {
     setAuthLoading(true);
     setLoginError('');
     
+    // Strict Supabase Auth - No default passwords
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      setLoginError(error.message);
+      setLoginError("Access Denied: Invalid Credentials.");
     } else {
       setView('admin');
     }
@@ -64,52 +65,77 @@ function App() {
   // Admin View
   if (view === 'admin') {
     if (!session) {
-      // Admin Login Form
+      // Secure Admin Login Form
       return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black text-zinc-900 dark:text-white p-6 relative transition-colors duration-300">
+        <div className="min-h-screen flex items-center justify-center bg-zinc-100 dark:bg-[#050505] text-zinc-900 dark:text-white p-6 relative transition-colors duration-300">
+             
+             {/* Background Pattern */}
+             <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
+
              <button 
                 onClick={handleBackToKiosk} 
-                className="absolute top-6 left-6 text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-2 text-xs font-bold tracking-widest uppercase transition-colors"
+                className="absolute top-8 left-8 text-zinc-500 hover:text-zinc-900 dark:hover:text-white flex items-center gap-2 text-xs font-bold tracking-widest uppercase transition-colors z-10"
             >
                 <Icons.ArrowRight className="w-4 h-4 rotate-180" /> Back to Kiosk
             </button>
 
-            <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 p-8 rounded-3xl shadow-2xl">
-                <div className="text-center mb-8">
-                    <div className="inline-block p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl mb-4 text-indigo-600 dark:text-indigo-400">
-                        <Icons.User className="w-6 h-6" />
+            <div className="w-full max-w-sm bg-white dark:bg-[#0A0A0A] border border-zinc-200 dark:border-white/10 p-10 rounded-3xl shadow-2xl relative z-10">
+                <div className="flex justify-center mb-8">
+                    <div className="w-12 h-12 bg-zinc-900 dark:bg-white rounded-full flex items-center justify-center shadow-lg">
+                        <Icons.User className="w-6 h-6 text-white dark:text-black" />
                     </div>
-                    <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Admin Access</h2>
-                    <p className="text-xs text-zinc-500 uppercase tracking-widest">Authorized Personnel Only</p>
                 </div>
+                
+                <div className="text-center mb-8">
+                    <h2 className="text-xl font-bold text-zinc-900 dark:text-white tracking-tight">Admin Authentication</h2>
+                    <p className="text-xs text-zinc-500 font-mono mt-2 uppercase tracking-widest">Secure Gateway v2.0</p>
+                </div>
+
                 <form onSubmit={handleAdminLogin} className="space-y-4">
-                    <div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 pl-1">Identity</label>
                         <input 
                             type="email" 
-                            placeholder="Email"
+                            placeholder="user@recolabs.system"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-white/10 focus:border-indigo-500 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 transition-colors"
+                            className="w-full px-4 py-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 transition-all"
+                            autoComplete="email"
+                            required
                         />
                     </div>
-                    <div>
+                    <div className="space-y-1">
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 pl-1">Keyphrase</label>
                          <input 
                             type="password" 
-                            placeholder="Password"
+                            placeholder="••••••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-black border border-zinc-200 dark:border-white/10 focus:border-indigo-500 outline-none text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 transition-colors"
+                            className="w-full px-4 py-3.5 rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 outline-none text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-700 transition-all"
+                            autoComplete="current-password"
+                            required
                         />
                     </div>
-                    {loginError && <p className="text-red-500 text-xs text-center">{loginError}</p>}
+                    
+                    {loginError && (
+                        <div className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 flex items-center gap-2 text-red-600 dark:text-red-400 text-xs font-bold justify-center animate-in slide-in-from-bottom-2 fade-in">
+                            <Icons.AlertCircle className="w-4 h-4" />
+                            {loginError}
+                        </div>
+                    )}
+
                     <button 
                         type="submit"
                         disabled={authLoading}
-                        className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-colors text-sm tracking-wide shadow-lg"
+                        className="w-full py-4 bg-zinc-900 dark:bg-white text-white dark:text-black font-bold rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all text-xs uppercase tracking-widest shadow-lg hover:shadow-xl mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {authLoading ? 'Verifying...' : 'Sign In'}
+                        {authLoading ? 'Verifying Credentials...' : 'Authenticate'}
                     </button>
                 </form>
+
+                <p className="text-center mt-8 text-[10px] text-zinc-400 dark:text-zinc-600 font-mono">
+                    Protected by Supabase Auth Security
+                </p>
             </div>
         </div>
       );

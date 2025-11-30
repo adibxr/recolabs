@@ -356,16 +356,36 @@ const StudentKiosk: React.FC<StudentKioskProps> = ({ onAdminClick, onDocsClick }
 
         {/* RESULT SCREEN */}
         {mode === 'result' && (
-             <div className="text-center animate-in zoom-in-95 duration-300 max-w-md">
-                <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-8 border-2 ${message.type === 'success' ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' : 'border-red-500/20 bg-red-500/10 text-red-600 dark:text-red-500'}`}>
-                    {message.type === 'success' ? <Icons.CheckCircle className="w-10 h-10" /> : <Icons.AlertCircle className="w-10 h-10" />}
+             <div className="w-full max-w-2xl bg-white/60 dark:bg-black/40 backdrop-blur-2xl border border-zinc-200/50 dark:border-white/10 p-12 rounded-[2.5rem] shadow-2xl animate-in zoom-in-95 duration-500 relative overflow-hidden flex flex-col items-center text-center">
+                
+                {/* Background Glow */}
+                <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${message.type === 'success' ? 'from-emerald-400 via-teal-500 to-emerald-600' : 'from-red-500 via-rose-500 to-red-600'}`}></div>
+                <div className={`absolute -top-20 -left-20 w-64 h-64 rounded-full blur-[100px] opacity-20 pointer-events-none ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
+                <div className={`absolute -bottom-20 -right-20 w-64 h-64 rounded-full blur-[100px] opacity-20 pointer-events-none ${message.type === 'success' ? 'bg-indigo-500' : 'bg-orange-500'}`}></div>
+
+                {/* Icon */}
+                <div className={`w-28 h-28 rounded-full flex items-center justify-center mb-8 shadow-xl ${message.type === 'success' ? 'bg-gradient-to-br from-emerald-400 to-teal-600 text-white shadow-emerald-500/30' : 'bg-gradient-to-br from-red-400 to-rose-600 text-white shadow-red-500/30'}`}>
+                    {message.type === 'success' ? <Icons.CheckCircle className="w-14 h-14" /> : <Icons.AlertCircle className="w-14 h-14" />}
                 </div>
-                <h3 className="text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-tight">{message.title}</h3>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm font-mono leading-relaxed mb-10 border-l-2 border-zinc-300 dark:border-zinc-800 pl-4 ml-4 text-left">
-                    {message.text}
-                </p>
-                <button onClick={reset} className="px-10 py-4 rounded-xl bg-zinc-900 dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 hover:bg-zinc-800 dark:hover:bg-white hover:text-white dark:hover:text-black text-white text-xs font-bold tracking-widest uppercase transition-all shadow-lg">
-                    Return to System
+
+                {/* Text */}
+                <h3 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-6 tracking-tighter">
+                    {message.title}
+                </h3>
+                
+                <div className="bg-white/50 dark:bg-white/5 border border-zinc-200/50 dark:border-white/5 rounded-2xl p-6 mb-10 w-full max-w-lg mx-auto backdrop-blur-sm">
+                    <p className="text-zinc-700 dark:text-zinc-300 text-lg md:text-xl font-medium leading-relaxed">
+                        {message.text}
+                    </p>
+                </div>
+
+                {/* Button */}
+                <button 
+                    onClick={reset} 
+                    className="group relative px-12 py-5 rounded-2xl bg-zinc-900 dark:bg-white text-white dark:text-black text-sm font-bold tracking-[0.2em] uppercase transition-all hover:scale-105 shadow-xl hover:shadow-2xl overflow-hidden"
+                >
+                    <span className="relative z-10">Return to System</span>
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </button>
              </div>
         )}
